@@ -1,28 +1,22 @@
-# Ticket: Dependency Audit and Upgrade
+# Ticket: Upgrade Java 21 to Java 26
 
 **Priority:** Medium
-**Description:** Audit all project dependencies against their latest available versions and upgrade any that are outdated.
+**Description:** Upgrade the Java version target from 21 to 26 to match the installed JDK runtime.
 
-## Current Dependency Versions
+## Current vs Target
 
-| Dependency | Current Version | Latest Available | Status |
-|---|---|---|---|
-| Spring Boot (parent POM) | 4.1.0 | 4.1.0 | Up to date |
-| Spring AI | 2.0.0 | 2.0.0 | Up to date |
-| springdoc-openapi | 3.0.3 | 3.0.3 | Up to date |
-| exec-maven-plugin | 3.5.0 | 3.6.3 | **Outdated** |
+| Property | Current | Target |
+|---|---|---|
+| `java.version` in `pom.xml` | 21 | 26 |
+| Installed JDK | 26.0.1 | 26.0.1 |
 
 ## Requirements
 
-1. Verify current versions for all dependencies declared in `pom.xml`
-2. Check Maven Central / official sources for latest stable releases
-3. Upgrade any outdated dependencies
-4. Review changelogs for breaking changes before upgrading
-5. Run `mvn compile -q` and `mvn test -q` to verify nothing is broken
+1. Update `<java.version>` from `21` to `26` in `pom.xml`
+2. Run `mvn compile -q` and `mvn test -q` to verify
 
 ## Acceptance Criteria
 
-- All dependencies are at their latest stable versions
 - Application compiles without errors
 - All existing tests pass
 - No regressions in functionality
