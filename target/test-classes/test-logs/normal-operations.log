@@ -1,0 +1,35 @@
+2026-07-06T10:00:00.123Z  INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer : Tomcat initialized with port(s): 8080 (http)
+2026-07-06T10:00:00.456Z  INFO  [main] o.a.c.c.A.[Tomcat].[localhost].[/] : Initializing Spring embedded WebApplicationContext
+2026-07-06T10:00:01.001Z  INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer : Tomcat started on port 8080 (http)
+2026-07-06T10:00:01.234Z  INFO  [main] c.e.loganalyzer.LoganalyzerApplication : Started LoganalyzerApplication in 2.345 seconds
+2026-07-06T10:00:05.678Z  INFO  [http-nio-8080-exec-1] c.e.l.controller.LogAnalysisController : Received log analysis request
+2026-07-06T10:00:06.012Z  INFO  [http-nio-8080-exec-1] c.e.l.service.LogParserService : Parsing 150 log entries
+2026-07-06T10:00:07.345Z  INFO  [http-nio-8080-exec-1] c.e.l.service.LogAnalysisService : Analysis completed in 1234ms
+2026-07-06T10:00:10.789Z  INFO  [http-nio-8080-exec-2] c.e.l.controller.LogAnalysisController : Received batch analysis request
+2026-07-06T10:00:11.012Z  INFO  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Processing batch of 5 log sets
+2026-07-06T10:00:15.345Z  WARN  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Batch processing took 4333ms (threshold: 3000ms)
+2026-07-06T10:00:16.678Z  INFO  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Batch analysis completed successfully
+2026-07-06T10:00:20.012Z  INFO  [scheduling-1] c.e.l.service.LogCleanupService : Starting log cleanup job
+2026-07-06T10:00:21.345Z  INFO  [scheduling-1] c.e.l.service.LogCleanupService : Cleaned up 150 old log entries
+2026-07-06T10:00:22.678Z  INFO  [scheduling-1] c.e.l.service.LogCleanupService : Log cleanup completed
+2026-07-06T10:00:30.012Z  INFO  [http-nio-8080-exec-3] c.e.l.controller.LogAnalysisController : Health check requested
+2026-07-06T10:00:30.234Z  INFO  [http-nio-8080-exec-3] c.e.l.controller.LogAnalysisController : Health status: running
+2026-07-06T10:01:00.001Z  INFO  [http-nio-8080-exec-4] c.e.l.service.LogAnalysisService : Starting new analysis session
+2026-07-06T10:01:00.567Z  INFO  [http-nio-8080-exec-4] c.e.l.service.LogParserService : Parsing 89 log entries
+2026-07-06T10:01:01.890Z  INFO  [http-nio-8080-exec-4] c.e.l.service.LogAnalysisService : Analysis completed
+2026-07-06T10:02:00.123Z  INFO  [http-nio-8080-exec-5] c.e.l.controller.LogAnalysisController : Received analysis request
+2026-07-06T10:02:00.456Z  INFO  [http-nio-8080-exec-5] c.e.l.service.LogAnalysisService : Processing 200 log entries
+2026-07-06T10:02:01.789Z  INFO  [http-nio-8080-exec-5] c.e.l.service.LogAnalysisService : Analysis completed successfully
+2026-07-06T10:03:00.012Z  INFO  [http-nio-8080-exec-6] c.e.l.controller.LogAnalysisController : Batch request received
+2026-07-06T10:03:00.345Z  INFO  [http-nio-8080-exec-6] c.e.l.service.LogAnalysisService : Processing batch of 10 log sets
+2026-07-06T10:03:05.678Z  WARN  [http-nio-8080-exec-6] c.e.l.service.LogAnalysisService : Large batch detected: 10 sets
+2026-07-06T10:03:10.012Z  INFO  [http-nio-8080-exec-6] c.e.l.service.LogAnalysisService : Batch processing completed
+2026-07-06T10:04:00.234Z  INFO  [scheduling-1] c.e.l.service.MetricsCollector : Collecting analysis metrics
+2026-07-06T10:04:00.567Z  INFO  [scheduling-1] c.e.l.service.MetricsCollector : Total analyses today: 45
+2026-07-06T10:04:00.890Z  INFO  [scheduling-1] c.e.l.service.MetricsCollector : Average analysis time: 1.2s
+2026-07-06T10:05:00.012Z  INFO  [http-nio-8080-exec-7] c.e.l.controller.LogAnalysisController : New request incoming
+2026-07-06T10:05:00.345Z  INFO  [http-nio-8080-exec-7] c.e.l.service.LogAnalysisService : Starting analysis
+2026-07-06T10:05:01.678Z  INFO  [http-nio-8080-exec-7] c.e.l.service.LogAnalysisService : Analysis complete
+2026-07-06T10:10:00.012Z  INFO  [main] c.e.l.LoganalyzerApplication : Application shutdown initiated
+2026-07-06T10:10:00.345Z  INFO  [main] o.a.c.c.A.[Tomcat].[localhost].[/] : Closing Spring embedded WebApplicationContext
+2026-07-06T10:10:00.678Z  INFO  [main] c.e.l.LoganalyzerApplication : Application stopped successfully

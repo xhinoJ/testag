@@ -1,0 +1,105 @@
+2026-07-06T09:00:00.123Z ERROR [http-nio-8080-exec-1] c.e.l.service.UserService : User lookup failed
+java.lang.NullPointerException: Cannot invoke method on null object
+    at com.example.loganalyzer.service.UserService.processUser(UserService.java:45)
+    at com.example.loganalyzer.controller.UserController.handleRequest(UserController.java:32)
+    at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:897)
+    at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:559)
+    at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+2026-07-06T09:01:00.456Z ERROR [http-nio-8080-exec-2] c.e.l.service.DatabaseService : Query execution failed
+org.springframework.dao.DataAccessResourceFailureException: Unable to acquire JDBC Connection
+    at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:277)
+    at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:538)
+    at com.example.loganalyzer.repository.UserRepository.findById(UserRepository.java:23)
+    at com.example.loganalyzer.service.UserService.getUser(UserService.java:67)
+2026-07-06T09:02:00.789Z ERROR [http-nio-8080-exec-3] c.e.l.service.SqlService : SQL error
+java.sql.SQLSyntaxErrorException: Table 'users' doesn't exist
+    at com.mysql.cj.jdbc.exports.ResultSetImpl.findColumn(ResultSetImpl.java:316)
+    at org.hibernate.loader.Loader.getColumnAliases(Loader.java:1234)
+    at org.hibernate.loader.Loader.getRowFromResultSet(Loader.java:349)
+    at org.hibernate.loader.Loader.getResultSet(Loader.java:1876)
+2026-07-06T09:03:00.012Z ERROR [http-nio-8080-exec-4] c.e.l.service.MemoryService : Memory allocation failed
+java.lang.OutOfMemoryError: Java heap space
+    at java.base/java.util.Arrays.copyOf(Arrays.java:3512)
+    at java.base/java.util.ArrayList.grow(ArrayList.java:237)
+    at java.base/java.util.ArrayList.add(ArrayList.java:421)
+    at com.example.loganalyzer.service.BatchProcessor.processBatch(BatchProcessor.java:89)
+    at com.example.loganalyzer.service.LogAnalysisService.processBatch(LogAnalysisService.java:134)
+2026-07-06T09:04:00.345Z ERROR [http-nio-8080-exec-5] c.e.l.client.ExternalApiClient : External API call failed
+org.springframework.web.client.ResourceAccessException: I/O error: Connection refused
+    at org.springframework.web.client.DefaultResponseErrorHandler.handleError(DefaultResponseErrorHandler.java:123)
+    at org.springframework.web.client.RestTemplate.doExecuteInternal(RestTemplate.java:292)
+    at com.example.loganalyzer.client.ExternalApiClient.callService(ExternalApiClient.java:56)
+    at com.example.loganalyzer.service.LogAnalysisService.enrichLogs(LogAnalysisService.java:112)
+2026-07-06T09:05:00.678Z ERROR [http-nio-8080-exec-6] c.e.l.service.AuthService : Authentication error
+org.springframework.security.authentication.BadCredentialsException: Bad credentials
+    at org.springframework.security.authentication.dao.DaoAuthenticationProvider.authenticate(DaoAuthenticationProvider.java:184)
+    at org.springframework.security.authentication.ProviderManager.authenticate(ProviderManager.java:241)
+    at com.example.loganalyzer.service.AuthenticationService.authenticate(AuthenticationService.java:34)
+2026-07-06T09:06:00.012Z ERROR [http-nio-8080-exec-7] c.e.l.service.FileService : File read error
+java.io.FileNotFoundException: /data/logs/archive.log (No such file or directory)
+    at java.io.FileInputStream.open0(Native Method)
+    at java.io.FileInputStream.open(FileInputStream.java:195)
+    at com.example.loganalyzer.service.FileService.readFile(FileService.java:56)
+    at com.example.loganalyzer.service.LogArchiveService.archive(LogArchiveService.java:78)
+2026-07-06T09:07:00.345Z ERROR [http-nio-8080-exec-8] c.e.l.service.RedisService : Redis connection error
+org.springframework.data.redis.RedisConnectionFailureException: Unable to connect to Redis
+    at org.springframework.data.redis.connection.jedis.JedisConnectionFactory.fetchJedisConnection(JedisConnectionFactory.java:189)
+    at org.springframework.data.redis.connection.jedis.JedisConnectionFactory.getConnection(JedisConnectionFactory.java:326)
+    at com.example.loganalyzer.service.CacheService.get(CacheService.java:45)
+2026-07-06T09:08:00.678Z ERROR [http-nio-8080-exec-9] c.e.l.service.MailService : Email send failed
+org.springframework.mail.MailSendException: Failed to send email
+    at org.springframework.mail.javamail.JavaMailSenderImpl.doSend(JavaMailSenderImpl.java:534)
+    at org.springframework.mail.javamail.JavaMailSenderImpl.send(JavaMailSenderImpl.java:367)
+    at com.example.loganalyzer.service.MailService.sendAlert(MailService.java:67)
+2026-07-06T09:09:00.012Z ERROR [http-nio-8080-exec-10] c.e.l.service.ScheduleService : Task scheduling failed
+java.lang.IllegalStateException: Task already scheduled
+    at java.util.concurrent.ScheduledThreadPoolExecutor.schedule(ScheduledThreadPoolExecutor.java:397)
+    at java.util.concurrent.ScheduledThreadPoolExecutor.schedule(ScheduledThreadPoolExecutor.java:381)
+    at com.example.loganalyzer.service.ScheduleService.scheduleTask(ScheduleService.java:78)
+2026-07-06T09:10:00.345Z ERROR [http-nio-8080-exec-1] c.e.l.service.ValidationService : Input validation failed
+javax.validation.ConstraintViolationException: Validation failed for class LogEntry
+    at org.hibernate.boot.beanvalidation.BeanValidationEventListener.validate(BeanValidationEventListener.java:112)
+    at org.hibernate.event.internal.AbstractFlushingEventListener.flushEverythingToExecutions(AbstractFlushingEventListener.java:267)
+    at com.example.loganalyzer.service.ValidationService.validateInput(ValidationService.java:45)
+2026-07-06T09:11:00.678Z ERROR [http-nio-8080-exec-2] c.e.l.service.JsonService : JSON deserialization error
+com.fasterxml.jackson.databind.exc.MismatchedInputException: Cannot deserialize instance of LogEntry out of START_ARRAY
+    at com.fasterxml.jackson.databind.DeserializationContext.wrongToken(DeserializationContext.java:552)
+    at com.fasterxml.jackson.databind.deser.BeanDeserializer.deserialize(BeanDeserializer.java:186)
+    at com.example.loganalyzer.service.MappingService.mapToObject(MappingService.java:34)
+2026-07-06T09:12:00.012Z ERROR [http-nio-8080-exec-3] c.e.l.service.EncryptionService : Encryption key error
+java.security.InvalidKeyException: Illegal key size
+    at javax.crypto.Cipher.checkCryptoPerm(Cipher.java:1041)
+    at javax.crypto.Cipher.init(Cipher.java:649)
+    at com.example.loganalyzer.service.EncryptionService.encrypt(EncryptionService.java:56)
+2026-07-06T09:13:00.345Z ERROR [http-nio-8080-exec-4] c.e.l.service.ExportService : Export I/O error
+java.io.IOException: No space left on device
+    at java.io.FileOutputStream.write(Native Method)
+    at java.io.FileOutputStream.write(FileOutputStream.java:348)
+    at com.example.loganalyzer.service.ExportService.exportToFile(ExportService.java:78)
+2026-07-06T09:14:00.678Z ERROR [http-nio-8080-exec-5] c.e.l.client.HttpClient : HTTP client error
+org.springframework.web.client.HttpClientErrorException$NotFound: 404 Not Found
+    at org.springframework.web.client.HttpClientErrorException.create(HttpClientErrorException.java:85)
+    at org.springframework.web.client.DefaultResponseErrorHandler.handleError(DefaultResponseErrorHandler.java:78)
+    at com.example.loganalyzer.service.ImportService.importFromUrl(ImportService.java:56)
+2026-07-06T09:15:00.012Z ERROR [http-nio-8080-exec-6] c.e.l.service.WebhookService : Webhook delivery timeout
+java.net.SocketTimeoutException: Read timed out
+    at java.net.SocketInputStream.socketRead0(Native Method)
+    at java.net.SocketInputStream.socketRead(SocketInputStream.java:65)
+    at com.example.loganalyzer.service.WebhookService.deliver(WebhookService.java:67)
+2026-07-06T09:16:00.345Z ERROR [http-nio-8080-exec-7] c.e.l.service.ReportService : Report generation error
+org.apache.poi.openxml4j.exceptions.InvalidFormatException: Can not read input file
+    at org.apache.poi.openxml4j.opc.OPCPackage.open(OPCPackage.java:234)
+    at com.example.loganalyzer.service.ReportService.generateReport(ReportService.java:89)
+2026-07-06T09:17:00.678Z ERROR [http-nio-8080-exec-8] c.e.l.service.QuartzService : Job execution failed
+org.quartz.JobExecutionException: Job threw an unhandled Exception
+    at org.quartz.core.JobRunShell.run(JobRunShell.java:213)
+    at org.quartz.core.WorkerThread.run(WorkerThread.java:234)
+    at com.example.loganalyzer.service.SchedulerService.executeJob(SchedulerService.java:45)
+2026-07-06T09:18:00.012Z ERROR [http-nio-8080-exec-9] c.e.l.service.AopService : AOP proxy error
+org.springframework.aop.framework.AopInvocationException: Null return value from advice does not match primitive return type
+    at org.springframework.aop.framework.CglibAopProxy.intercept(CglibAopProxy.java:723)
+    at com.example.loganalyzer.service.ProxyService.getTarget(ProxyService.java:34)
+2026-07-06T09:19:00.345Z ERROR [http-nio-8080-exec-10] c.e.l.service.GracefulShutdown : Shutdown handler error
+org.springframework.context.ApplicationContextException: Failed to start bean in lifecycle
+    at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:245)
+    at com.example.loganalyzer.service.ShutdownService.initiateShutdown(ShutdownService.java:56)

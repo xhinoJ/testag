@@ -1,0 +1,53 @@
+2026-07-06T08:00:00.123Z  INFO  [main] o.s.b.w.e.tomcat.TomcatWebServer : Tomcat started on port 8080
+2026-07-06T08:00:00.456Z  INFO  [main] c.e.l.LoganalyzerApplication : Started LoganalyzerApplication in 2.3s
+2026-07-06T08:00:05.678Z  INFO  [http-nio-8080-exec-1] c.e.l.controller.LogAnalysisController : Request received
+2026-07-06T08:01:00.012Z  INFO  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Processing analysis
+2026-07-06T08:01:05.345Z  WARN  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Slow response from AI model: 5333ms
+2026-07-06T08:02:00.678Z  INFO  [http-nio-8080-exec-3] c.e.l.controller.LogAnalysisController : New request
+2026-07-06T08:02:10.012Z  WARN  [http-nio-8080-exec-3] c.e.l.service.LogParserService : Large log payload: 50KB
+2026-07-06T08:03:00.345Z ERROR [http-nio-8080-exec-4] c.e.l.service.LogAnalysisService : Analysis failed
+java.lang.NullPointerException: Input log content cannot be null
+    at com.example.loganalyzer.service.LogAnalysisService.analyzeRawLogs(LogAnalysisService.java:34)
+    at com.example.loganalyzer.controller.LogAnalysisController.analyzeLogs(LogAnalysisController.java:28)
+2026-07-06T08:04:00.678Z  INFO  [http-nio-8080-exec-5] c.e.l.service.LogAnalysisService : Retrying analysis
+2026-07-06T08:05:00.012Z  INFO  [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Batch processing started
+2026-07-06T08:05:05.345Z  WARN  [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Memory usage high: 78%
+2026-07-06T08:05:10.678Z  WARN  [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Memory usage critical: 92%
+2026-07-06T08:05:15.012Z ERROR [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : OutOfMemoryError
+java.lang.OutOfMemoryError: Java heap space
+    at java.base/java.util.Arrays.copyOf(Arrays.java:3512)
+    at com.example.loganalyzer.service.BatchProcessor.processBatch(BatchProcessor.java:89)
+2026-07-06T08:06:00.345Z  INFO  [http-nio-8080-exec-7] c.e.l.service.GarbageCollector : GC cleanup initiated
+2026-07-06T08:06:01.678Z  WARN  [http-nio-8080-exec-7] c.e.l.service.GarbageCollector : Full GC pause: 1234ms
+2026-07-06T08:07:00.012Z  INFO  [http-nio-8080-exec-8] c.e.l.service.MetricsCollector : Metrics collected
+2026-07-06T08:07:05.345Z  WARN  [http-nio-8080-exec-8] c.e.l.service.MetricsCollector : Metric collection slow: 5333ms
+2026-07-06T08:08:00.678Z ERROR [http-nio-8080-exec-9] c.e.l.service.DatabaseService : Connection failed
+org.springframework.dao.DataAccessResourceFailureException: Unable to acquire JDBC Connection
+    at org.springframework.orm.jpa.vendor.HibernateJpaDialect.convertHibernateAccessException(HibernateJpaDialect.java:277)
+2026-07-06T08:09:00.012Z  INFO  [http-nio-8080-exec-10] c.e.l.service.ConnectionPool : Reconnecting to database
+2026-07-06T08:09:05.345Z  INFO  [http-nio-8080-exec-10] c.e.l.service.ConnectionPool : Connection reestablished
+2026-07-06T08:10:00.678Z  INFO  [scheduling-1] c.e.l.service.CleanupJob : Starting cleanup
+2026-07-06T08:10:05.012Z  INFO  [scheduling-1] c.e.l.service.CleanupJob : Cleanup completed: 200 entries archived
+2026-07-06T08:15:00.345Z  WARN  [http-nio-8080-exec-1] c.e.l.service.CacheService : Cache miss rate high: 45%
+2026-07-06T08:15:05.678Z  INFO  [http-nio-8080-exec-2] c.e.l.service.LogAnalysisService : Analysis completed
+2026-07-06T08:16:00.012Z ERROR [http-nio-8080-exec-3] c.e.l.service.ExternalApiClient : External service timeout
+org.springframework.web.client.ResourceAccessException: I/O error: Read timed out
+    at org.springframework.web.client.DefaultResponseErrorHandler.handleError(DefaultResponseErrorHandler.java:123)
+    at com.example.loganalyzer.client.ExternalApiClient.callService(ExternalApiClient.java:56)
+2026-07-06T08:17:00.345Z  INFO  [http-nio-8080-exec-4] c.e.l.service.RetryService : Retrying external service call
+2026-07-06T08:17:05.678Z  INFO  [http-nio-8080-exec-4] c.e.l.service.RetryService : External service call succeeded on retry 2
+2026-07-06T08:18:00.012Z  WARN  [http-nio-8080-exec-5] c.e.l.service.ThreadPoolMonitor : Thread pool nearing capacity: 18/20 active
+2026-07-06T08:18:05.345Z  WARN  [http-nio-8080-exec-5] c.e.l.service.ThreadPoolMonitor : Request queue growing: 45 pending
+2026-07-06T08:19:00.678Z  INFO  [http-nio-8080-exec-6] c.e.l.controller.LogAnalysisController : Batch request received
+2026-07-06T08:19:05.012Z  INFO  [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Processing 50 log sets
+2026-07-06T08:19:10.345Z  WARN  [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Batch processing slow: 5333ms
+2026-07-06T08:19:15.678Z ERROR [http-nio-8080-exec-6] c.e.l.service.BatchProcessor : Batch timeout after 15s
+2026-07-06T08:20:00.012Z  INFO  [http-nio-8080-exec-7] c.e.l.service.Monitor : System health check
+2026-07-06T08:20:05.345Z  WARN  [http-nio-8080-exec-7] c.e.l.service.Monitor : CPU usage elevated: 89%
+2026-07-06T08:20:10.678Z  WARN  [http-nio-8080-exec-7] c.e.l.service.Monitor : Memory usage critical: 95%
+2026-07-06T08:21:00.012Z  INFO  [scheduling-1] c.e.l.service.PerformanceReport : Generating daily report
+2026-07-06T08:21:05.345Z  INFO  [scheduling-1] c.e.l.service.PerformanceReport : Report generated: 45 analyses, 3 failures
+2026-07-06T08:25:00.678Z  INFO  [http-nio-8080-exec-8] c.e.l.controller.LogAnalysisController : Health check
+2026-07-06T08:25:00.890Z  INFO  [http-nio-8080-exec-8] c.e.l.controller.LogAnalysisController : Status: running
+2026-07-06T08:30:00.012Z  INFO  [main] c.e.l.LoganalyzerApplication : Shutdown initiated
+2026-07-06T08:30:00.345Z  INFO  [main] c.e.l.LoganalyzerApplication : Application stopped
