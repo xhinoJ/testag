@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Upgraded exec-maven-plugin from 3.5.0 to 3.6.3
 - Upgraded Spring Boot from 3.5.3 to 4.1.0
 - Upgraded Spring AI from 1.0.0 to 2.0.0
 - Upgraded springdoc-openapi from 2.8.6 to 3.0.3
