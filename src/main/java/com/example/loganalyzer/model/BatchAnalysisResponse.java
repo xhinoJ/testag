@@ -6,7 +6,7 @@ import java.util.List;
 public record BatchAnalysisResponse(
     String status,
     LocalDateTime analyzedAt,
-    int totalBatches,
+    int totalResults,
     List<LogAnalysisResult> results
 ) {
     public static BatchAnalysisResponse success(List<LogAnalysisResult> results) {

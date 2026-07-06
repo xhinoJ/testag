@@ -22,8 +22,8 @@ public class RequestLoggingInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
                                 Object handler, Exception ex) {
-        Long startTime = (Long) request.getAttribute(START_TIME_ATTRIBUTE);
-        if (startTime == null) {
+        Object startTimeAttr = request.getAttribute(START_TIME_ATTRIBUTE);
+        if (!(startTimeAttr instanceof Long startTime)) {
             return;
         }
 

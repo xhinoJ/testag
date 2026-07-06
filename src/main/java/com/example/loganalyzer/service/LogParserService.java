@@ -1,6 +1,8 @@
 package com.example.loganalyzer.service;
 
 import com.example.loganalyzer.model.LogEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -14,6 +16,8 @@ import java.util.regex.Pattern;
 @Service
 public class LogParserService {
 
+    private static final Logger log = LoggerFactory.getLogger(LogParserService.class);
+
     private static final DateTimeFormatter TIMESTAMP_FORMAT =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -26,7 +30,7 @@ public class LogParserService {
 
     public List<LogEntry> parse(String rawLogs) {
         List<LogEntry> entries = new ArrayList<>();
-        String[] lines = rawLogs.split("\n");
+        String[] lines = rawLogs.split("\\r?\\n");
 
         StringBuilder currentStackTrace = new StringBuilder();
         LogEntry currentEntry = null;
@@ -40,7 +44,13 @@ public class LogParserService {
                 }
 
                 LocalDateTime timestamp = parseTimestamp(matcher.group(1));
-                LogEntry.LogLevel level = LogEntry.LogLevel.valueOf(matcher.group(2));
+                LogEntry.LogLevel level;
+                try {
+                    level = LogEntry.LogLevel.valueOf(matcher.group(2));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown log level '{}', defaulting to INFO", matcher.group(2));
+                    level = LogEntry.LogLevel.INFO;
+                }
                 String thread = matcher.group(3);
                 String logger = matcher.group(4);
                 String message = matcher.group(5);
@@ -74,6 +84,7 @@ public class LogParserService {
         try {
             return LocalDateTime.parse(timestamp, TIMESTAMP_FORMAT);
         } catch (DateTimeParseException e) {
+            log.warn("Failed to parse timestamp '{}', using current time", timestamp);
             return LocalDateTime.now();
         }
     }
