@@ -6,14 +6,14 @@ AI-powered log analysis for Spring Boot applications using Spring AI with Ollama
 
 | Technology | Version |
 |------------|---------|
-| Java | 21 |
+| Java | 26 |
 | Spring Boot | 4.1.0 |
 | Spring AI | 2.0.0 |
 | springdoc-openapi | 3.0.3 |
 
 ## Prerequisites
 
-- Java 21+
+- Java 26+
 - Maven 3.8+
 - Ollama (local LLM runtime)
 
