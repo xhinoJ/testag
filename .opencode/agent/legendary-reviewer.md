@@ -1,7 +1,6 @@
 ---
 description: Elite Principal Engineer performing thorough code reviews for bugs, security, architecture, and maintainability.
 mode: subagent
-model: anthropic/claude-sonnet-4-6
 permission:
   edit: deny
   bash: ask

@@ -1,5 +1,7 @@
 package com.example.loganalyzer.service;
 
+import com.example.loganalyzer.exception.LogAnalysisException;
+import com.example.loganalyzer.model.AnalysisOutput;
 import com.example.loganalyzer.model.AnalysisType;
 import com.example.loganalyzer.model.LogAnalysisResult;
 import com.example.loganalyzer.model.LogEntry;
@@ -19,17 +21,16 @@ public class LogAnalysisService {
     private final LogParserService logParserService;
     private final PromptTemplateService promptTemplateService;
 
-    public LogAnalysisService(ChatClient.Builder chatClientBuilder,
+    public LogAnalysisService(ChatClient chatClient,
                               LogParserService logParserService,
                               PromptTemplateService promptTemplateService) {
-        this.chatClient = chatClientBuilder.build();
+        this.chatClient = chatClient;
         this.logParserService = logParserService;
         this.promptTemplateService = promptTemplateService;
     }
 
-    public LogAnalysisResult analyzeRawLogs(String rawLogs) {
-        List<LogEntry> entries = logParserService.parse(rawLogs);
-        return analyze(entries, AnalysisType.FULL);
+    public List<LogEntry> parseLogs(String rawLogs) {
+        return logParserService.parse(rawLogs);
     }
 
     public LogAnalysisResult analyze(List<LogEntry> logs, AnalysisType type) {
@@ -42,22 +43,25 @@ public class LogAnalysisService {
                     .filter(e -> e.level() == LogEntry.LogLevel.ERROR ||
                                  e.level() == LogEntry.LogLevel.FATAL)
                     .findFirst()
-                    .orElse(logs.get(0));
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "No ERROR or FATAL log entries found for root cause analysis"));
                 yield promptTemplateService.buildRootCausePrompt(errorLog);
             }
             case PATTERNS -> promptTemplateService.buildPatternsPrompt(logs);
             case FULL -> promptTemplateService.buildFullAnalysisPrompt(logs);
         };
 
-        String response = chatClient.prompt()
-            .user(prompt)
-            .call()
-            .content();
+        AnalysisOutput output;
+        try {
+            output = chatClient.prompt()
+                .user(prompt)
+                .call()
+                .entity(AnalysisOutput.class);
+        } catch (Exception e) {
+            log.error("AI analysis failed for type {}", type, e);
+            throw new LogAnalysisException("AI service unavailable: " + e.getMessage(), e);
+        }
 
-        return parseResponse(response, type, logs);
-    }
-
-    private LogAnalysisResult parseResponse(String response, AnalysisType type, List<LogEntry> logs) {
         long errorCount = logs.stream()
             .filter(e -> e.level() == LogEntry.LogLevel.ERROR || e.level() == LogEntry.LogLevel.FATAL)
             .count();
@@ -70,10 +74,10 @@ public class LogAnalysisService {
         return new LogAnalysisResult(
             type,
             severity,
-            response,
-            extractRootCause(response),
-            extractSuggestions(response),
-            extractPatterns(response),
+            output.summary(),
+            output.rootCause(),
+            output.suggestions(),
+            output.patterns(),
             logs.size(),
             (int) errorCount,
             (int) warnCount
@@ -81,6 +85,9 @@ public class LogAnalysisService {
     }
 
     private LogAnalysisResult.Severity determineSeverity(long errorCount, long warnCount, int total) {
+        if (total == 0) {
+            return LogAnalysisResult.Severity.LOW;
+        }
         if (errorCount == 0 && warnCount == 0) {
             return LogAnalysisResult.Severity.LOW;
         }
@@ -95,39 +102,5 @@ public class LogAnalysisService {
             return LogAnalysisResult.Severity.MEDIUM;
         }
         return LogAnalysisResult.Severity.LOW;
-    }
-
-    private String extractRootCause(String response) {
-        int rootCauseIdx = response.indexOf("root cause");
-        if (rootCauseIdx == -1) {
-            rootCauseIdx = response.indexOf("Root Cause");
-        }
-        if (rootCauseIdx == -1) {
-            rootCauseIdx = response.indexOf("ROOT CAUSE");
-        }
-        if (rootCauseIdx >= 0) {
-            int end = response.indexOf("\n\n", rootCauseIdx);
-            if (end == -1) end = Math.min(rootCauseIdx + 500, response.length());
-            return response.substring(rootCauseIdx, end).trim();
-        }
-        return response.substring(0, Math.min(500, response.length()));
-    }
-
-    private List<String> extractSuggestions(String response) {
-        return java.util.Arrays.stream(response.split("\n"))
-            .filter(line -> line.contains("suggest") || line.contains("recommend") ||
-                           line.contains("should") || line.contains("fix"))
-            .map(String::trim)
-            .filter(line -> !line.isEmpty())
-            .toList();
-    }
-
-    private List<String> extractPatterns(String response) {
-        return java.util.Arrays.stream(response.split("\n"))
-            .filter(line -> line.contains("pattern") || line.contains("recurring") ||
-                           line.contains("repeated") || line.contains("consistent"))
-            .map(String::trim)
-            .filter(line -> !line.isEmpty())
-            .toList();
     }
 }

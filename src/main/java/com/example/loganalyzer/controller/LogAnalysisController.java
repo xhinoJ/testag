@@ -7,6 +7,7 @@ import com.example.loganalyzer.model.BatchAnalysisResponse;
 import com.example.loganalyzer.model.HealthResponse;
 import com.example.loganalyzer.model.LogAnalysisRequest;
 import com.example.loganalyzer.model.LogAnalysisResult;
+import com.example.loganalyzer.model.LogEntry;
 import com.example.loganalyzer.service.LogAnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -29,6 +33,8 @@ public class LogAnalysisController {
     private static final Logger log = LoggerFactory.getLogger(LogAnalysisController.class);
 
     private final LogAnalysisService logAnalysisService;
+    private final ExecutorService analysisExecutor = Executors.newFixedThreadPool(
+        Math.min(Runtime.getRuntime().availableProcessors(), 8));
 
     public LogAnalysisController(LogAnalysisService logAnalysisService) {
         this.logAnalysisService = logAnalysisService;
@@ -63,7 +69,8 @@ public class LogAnalysisController {
             @Valid @RequestBody LogAnalysisRequest request) {
         log.info("Received log analysis request, type: {}", request.analysisType());
 
-        LogAnalysisResult result = logAnalysisService.analyzeRawLogs(request.logContent());
+        List<LogEntry> entries = logAnalysisService.parseLogs(request.logContent());
+        LogAnalysisResult result = logAnalysisService.analyze(entries, request.analysisType());
         return ResponseEntity.ok(AnalysisResponse.success(result));
     }
 
@@ -99,9 +106,17 @@ public class LogAnalysisController {
             @Valid @RequestBody BatchAnalysisRequest request) {
         log.info("Received batch analysis request, {} logs", request.logContents().size());
 
-        List<LogAnalysisResult> results = request.logContents().parallelStream()
-            .map(logAnalysisService::analyzeRawLogs)
+        List<CompletableFuture<LogAnalysisResult>> futures = request.logContents().stream()
+            .map(content -> CompletableFuture.supplyAsync(() -> {
+                List<LogEntry> entries = logAnalysisService.parseLogs(content);
+                return logAnalysisService.analyze(entries, request.analysisType());
+            }, analysisExecutor))
             .toList();
+
+        List<LogAnalysisResult> results = futures.stream()
+            .map(CompletableFuture::join)
+            .toList();
+
         return ResponseEntity.ok(BatchAnalysisResponse.success(results));
     }
 
