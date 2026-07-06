@@ -2,6 +2,15 @@
 
 AI-powered log analysis for Spring Boot applications using Spring AI with Ollama.
 
+## Tech Stack
+
+| Technology | Version |
+|------------|---------|
+| Java | 21 |
+| Spring Boot | 4.1.0 |
+| Spring AI | 2.0.0 |
+| springdoc-openapi | 3.0.3 |
+
 ## Prerequisites
 
 - Java 21+
@@ -26,6 +35,7 @@ mvn spring-boot:run
 | POST | `/api/logs/analyze` | Analyze a single log content |
 | POST | `/api/logs/batch` | Analyze multiple log sets |
 | GET | `/api/logs/health` | Health check |
+| GET | `/swagger-ui.html` | Swagger UI (API documentation) |
 
 ## Usage Examples
 
@@ -63,7 +73,7 @@ curl -X POST http://localhost:8080/api/logs/batch \
 Generate test log files:
 
 ```bash
-mvn exec:java -Dexec.mainClass="com.example.loganalyzer.service.LogGenerator"
+mvn exec:java -Dexec.mainClass="com.example.loganalyzer.service.LogGenerator" -Dexec.classpathScope=test
 ```
 
 Test files are in `src/test/resources/test-logs/`:
@@ -79,28 +89,103 @@ Edit `src/main/resources/application.yml`:
 
 ```yaml
 spring:
+  application:
+    name: log-analyzer
   ai:
     ollama:
       base-url: http://localhost:11434
       chat:
-        options:
-          model: llama3.1
-          temperature: 0.3
+        model: llama3.1
+        temperature: 0.3
+        num-threads: 4
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.example.loganalyzer: DEBUG
+    org.springframework.ai: DEBUG
 ```
+
+## Features
+
+### Global Exception Handling
+
+`GlobalExceptionHandler` provides structured error responses for validation errors, illegal arguments, and unexpected exceptions. Validation errors return `{"status": "error", "errors": {...}}` with per-field messages, while other errors return `{"status": "error", "message": "..."}`.
+
+### Request Logging
+
+`RequestLoggingInterceptor` logs HTTP method, URI, response status, and request duration (in milliseconds) for all `/api/logs/**` endpoints (excluding `/api/logs/health`).
+
+### Input Truncation
+
+`PromptTemplateService` enforces limits to prevent oversized prompts:
+- **MAX_ENTRIES**: 200 log entries per prompt
+- **MAX_ENTRY_CHARS**: 2000 characters per entry (longer entries are truncated)
+
+### Prompt Injection Mitigation
+
+Log data is wrapped in `<LOG_DATA>` / `</LOG_DATA>` delimiters with an explicit instruction guard to reduce the risk of prompt injection attacks.
+
+### Windows Line Endings
+
+`LogParserService` handles both Unix (`\n`) and Windows (`\r\n`) line endings.
+
+### Graceful Handling of Unknown Log Levels
+
+Unknown log levels in the input are logged as warnings and default to `INFO`.
 
 ## Project Structure
 
 ```
 src/main/java/com/example/loganalyzer/
 ├── LoganalyzerApplication.java
-├── config/AiConfig.java
-├── controller/LogAnalysisController.java
-├── model/ (LogEntry, AnalysisType, LogAnalysisResult, etc.)
+├── config/
+│   ├── AiConfig.java
+│   ├── OpenApiConfig.java
+│   ├── RequestLoggingInterceptor.java
+│   └── WebConfig.java
+├── controller/
+│   └── LogAnalysisController.java
+├── exception/
+│   ├── GlobalExceptionHandler.java
+│   └── LogAnalysisException.java
+├── model/
+│   ├── AnalysisOutput.java
+│   ├── AnalysisResponse.java
+│   ├── AnalysisType.java
+│   ├── BatchAnalysisRequest.java
+│   ├── BatchAnalysisResponse.java
+│   ├── HealthResponse.java
+│   ├── LogAnalysisRequest.java
+│   ├── LogAnalysisResult.java
+│   └── LogEntry.java
 └── service/
     ├── LogAnalysisService.java
     ├── LogParserService.java
     └── PromptTemplateService.java
 ```
+
+```
+src/test/java/com/example/loganalyzer/
+├── config/
+│   ├── RequestLoggingInterceptorTest.java
+│   └── WebConfigIntegrationTest.java
+└── service/
+    ├── LogGenerator.java
+    ├── LogGeneratorTest.java
+    └── LogParserServiceTest.java
+```
+
+## Development Workflow
+
+This project uses a two-agent development workflow:
+
+- **@legendary-backend-engineer** - Implements features, creates PRs
+- **@legendary-reviewer** - Reviews code, approves or requests changes
+
+See [AGENTS.md](AGENTS.md) for details.
 
 ## License
 
