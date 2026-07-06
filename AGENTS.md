@@ -14,6 +14,7 @@ User Ticket → @legendary-backend-engineer (create feature branch, implement, p
            → @legendary-reviewer (review + approve/request changes)
            → [iterate if needed]
            → @legendary-backend-engineer (merge PR into main, delete branch)
+           → 🔄 @legendary-tester (AUTO-TRIGGERED after merge to main — comprehensive QA)
 ```
 
 ## Agent: @legendary-backend-engineer
@@ -46,11 +47,28 @@ User Ticket → @legendary-backend-engineer (create feature branch, implement, p
 - Provide structured feedback: PASS/FAIL per file, issues by severity
 - Final verdict: APPROVE or REQUEST CHANGES (with specific items to fix)
 
+## Agent: @legendary-tester
+
+**Role:** Senior QA Automation Engineer. Auto-triggered after every merge to `main`. Comprehensive QA analysis across functional, API, security, performance, resilience, and edge case testing.
+
+**Instructions:**
+- Review the diff of what was merged
+- Identify the highest-risk areas
+- Execute comprehensive testing against those areas
+- Report findings in a structured QA report
+- See `.opencode/agent/legendary-tester.md` for full testing methodology
+
 ## Iteration Rules
 
 1. If reviewer says REQUEST CHANGES → @legendary-backend-engineer fixes only the listed items on the same feature branch
 2. If reviewer says APPROVE → @legendary-backend-engineer merges PR into main
 3. Max 3 iterations before escalating to user
+4. After merge → @legendary-tester runs comprehensive QA automatically
+
+## Automation
+
+The following CI workflow runs automatically on every push to `main`:
+- **`.github/workflows/qa-after-merge.yml`** — Compiles, runs unit/integration tests, mutation testing, dependency checks, static analysis, and OWASP vulnerability scanning.
 
 ## Documentation
 
