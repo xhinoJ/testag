@@ -1,20 +1,24 @@
 package com.example.loganalyzer.controller;
 
-import com.example.loganalyzer.model.*;
+import com.example.loganalyzer.model.AnalysisResponse;
+import com.example.loganalyzer.model.AnalysisType;
+import com.example.loganalyzer.model.BatchAnalysisRequest;
+import com.example.loganalyzer.model.BatchAnalysisResponse;
+import com.example.loganalyzer.model.HealthResponse;
+import com.example.loganalyzer.model.LogAnalysisRequest;
+import com.example.loganalyzer.model.LogAnalysisResult;
 import com.example.loganalyzer.service.LogAnalysisService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -56,7 +60,7 @@ public class LogAnalysisController {
                     )
                 )
             )
-            @RequestBody LogAnalysisRequest request) {
+            @Valid @RequestBody LogAnalysisRequest request) {
         log.info("Received log analysis request, type: {}", request.analysisType());
 
         LogAnalysisResult result = logAnalysisService.analyzeRawLogs(request.logContent());
@@ -92,14 +96,12 @@ public class LogAnalysisController {
                     )
                 )
             )
-            @RequestBody BatchAnalysisRequest request) {
+            @Valid @RequestBody BatchAnalysisRequest request) {
         log.info("Received batch analysis request, {} logs", request.logContents().size());
 
-        List<LogAnalysisResult> results = new ArrayList<>();
-        for (String logContent : request.logContents()) {
-            LogAnalysisResult result = logAnalysisService.analyzeRawLogs(logContent);
-            results.add(result);
-        }
+        List<LogAnalysisResult> results = request.logContents().parallelStream()
+            .map(logAnalysisService::analyzeRawLogs)
+            .toList();
         return ResponseEntity.ok(BatchAnalysisResponse.success(results));
     }
 
@@ -114,9 +116,4 @@ public class LogAnalysisController {
     public ResponseEntity<HealthResponse> health() {
         return ResponseEntity.ok(new HealthResponse("running"));
     }
-
-    public record HealthResponse(
-        @Schema(description = "Service status", example = "running")
-        String status
-    ) {}
 }
