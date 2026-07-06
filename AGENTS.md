@@ -11,7 +11,7 @@ User Ticket → @legendary-backend-engineer (implement + PR)
 
 ## Agent: @legendary-backend-engineer
 
-**Role:** Implement features, fix bugs, create PRs.
+**Role:** Implement features, fix bugs, create PRs, and merge after approval.
 
 **Instructions:**
 - Read the ticket requirements carefully
@@ -22,6 +22,7 @@ User Ticket → @legendary-backend-engineer (implement + PR)
 - Run `mvn compile -q` and `mvn test -q` before submitting
 - Create a PR with clear title and description
 - Do NOT merge — wait for review approval
+- After APPROVE: merge the PR and push
 
 ## Agent: @legendary-reviewer
 
