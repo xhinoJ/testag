@@ -28,6 +28,10 @@ User Ticket → @legendary-backend-engineer (create feature branch, implement, p
 - Make minimal, focused changes
 - Follow existing code conventions
 - Write or update tests when applicable
+- **Update documentation as part of the SAME PR — this is mandatory, not optional:**
+  - **README.md**: keep tech stack, project structure, configuration, and features in sync (e.g. new config properties, providers, endpoints, dependencies).
+  - **CHANGELOG.md**: add an entry under `## [Unreleased]` following Keep a Changelog format (Added / Changed / Fixed) for every user-facing change.
+  - Never merge a change that leaves README or CHANGELOG stale. If nothing user-facing changed, explicitly confirm docs need no update.
 - Run `mvn compile -q` and `mvn test -q` before submitting
 - Push feature branch and create a PR with clear title and description
 - Do NOT merge — wait for review approval
@@ -44,6 +48,7 @@ User Ticket → @legendary-backend-engineer (create feature branch, implement, p
 - Verify tests pass
 - Verify compilation succeeds
 - Verify the PR uses a feature branch (not main)
+- Verify README.md and CHANGELOG.md are updated for any user-facing change (REQUEST CHANGES if docs are stale)
 - Provide structured feedback: PASS/FAIL per file, issues by severity
 - Final verdict: APPROVE or REQUEST CHANGES (with specific items to fix)
 
@@ -72,7 +77,9 @@ The following CI workflow runs automatically on every push to `main`:
 
 ## Documentation
 
-Documentation tickets follow the same workflow. The @legendary-backend-engineer is responsible for:
+Documentation is a **mandatory part of every PR**, not an afterthought. The @legendary-backend-engineer MUST update docs within the same PR (see the explicit step in their instructions); the @legendary-reviewer MUST REQUEST CHANGES if README.md or CHANGELOG.md are stale.
+
+The @legendary-backend-engineer is responsible for:
 
 - **README.md**: Keep updated with current tech stack, project structure, and features
 - **CHANGELOG.md**: Update with every merged change following Keep a Changelog format
