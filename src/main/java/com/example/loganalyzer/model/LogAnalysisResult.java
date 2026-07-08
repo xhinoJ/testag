@@ -13,6 +13,19 @@ public record LogAnalysisResult(
     int errorCount,
     int warnCount
 ) {
+    public LogAnalysisResult {
+        suggestions = List.copyOf(suggestions);
+        patterns = List.copyOf(patterns);
+    }
+
+    public List<String> suggestions() {
+        return List.copyOf(suggestions);
+    }
+
+    public List<String> patterns() {
+        return List.copyOf(patterns);
+    }
+
     public enum Severity {
         LOW, MEDIUM, HIGH, CRITICAL
     }

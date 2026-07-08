@@ -13,8 +13,13 @@ public record BatchAnalysisRequest(
     AnalysisType analysisType
 ) {
     public BatchAnalysisRequest {
+        logContents = List.copyOf(logContents);
         if (analysisType == null) {
             analysisType = AnalysisType.FULL;
         }
+    }
+
+    public List<String> logContents() {
+        return List.copyOf(logContents);
     }
 }

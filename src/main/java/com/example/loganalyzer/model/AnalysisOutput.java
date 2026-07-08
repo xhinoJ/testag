@@ -7,4 +7,17 @@ public record AnalysisOutput(
     String rootCause,
     List<String> suggestions,
     List<String> patterns
-) {}
+) {
+    public AnalysisOutput {
+        suggestions = List.copyOf(suggestions);
+        patterns = List.copyOf(patterns);
+    }
+
+    public List<String> suggestions() {
+        return List.copyOf(suggestions);
+    }
+
+    public List<String> patterns() {
+        return List.copyOf(patterns);
+    }
+}

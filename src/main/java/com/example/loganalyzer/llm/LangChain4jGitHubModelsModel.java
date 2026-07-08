@@ -3,7 +3,9 @@ package com.example.loganalyzer.llm;
 import com.example.loganalyzer.exception.LogAnalysisException;
 import com.example.loganalyzer.model.AnalysisOutput;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.chat.response.ChatResponse;
@@ -25,6 +27,8 @@ public class LangChain4jGitHubModelsModel implements LogAnalysisModel {
         """;
 
     private final ChatModel chatModel;
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "ObjectMapper is thread-safe and intentionally injected/shared")
     private final ObjectMapper objectMapper;
 
     public LangChain4jGitHubModelsModel(ChatModel chatModel, ObjectMapper objectMapper) {
@@ -56,7 +60,7 @@ public class LangChain4jGitHubModelsModel implements LogAnalysisModel {
                 blankToNull(dto.rootCause()),
                 defaultList(dto.suggestions()),
                 defaultList(dto.patterns()));
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             log.error("Failed to parse LLM response into AnalysisOutput: {}", truncate(text), e);
             throw new LogAnalysisException("Unable to parse model response: " + e.getMessage(), e);
         }
