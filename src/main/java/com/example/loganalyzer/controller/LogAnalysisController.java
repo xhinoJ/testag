@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 
 @RestController
 @RequestMapping("/api/logs")
@@ -33,11 +32,11 @@ public class LogAnalysisController {
     private static final Logger log = LoggerFactory.getLogger(LogAnalysisController.class);
 
     private final LogAnalysisService logAnalysisService;
-    private final ExecutorService analysisExecutor = Executors.newFixedThreadPool(
-        Math.min(Runtime.getRuntime().availableProcessors(), 8));
+    private final Executor analysisExecutor;
 
-    public LogAnalysisController(LogAnalysisService logAnalysisService) {
+    public LogAnalysisController(LogAnalysisService logAnalysisService, Executor analysisExecutor) {
         this.logAnalysisService = logAnalysisService;
+        this.analysisExecutor = analysisExecutor;
     }
 
     @PostMapping("/analyze")
