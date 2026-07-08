@@ -9,6 +9,14 @@ public record BatchAnalysisResponse(
     int totalResults,
     List<LogAnalysisResult> results
 ) {
+    public BatchAnalysisResponse {
+        results = List.copyOf(results);
+    }
+
+    public List<LogAnalysisResult> results() {
+        return List.copyOf(results);
+    }
+
     public static BatchAnalysisResponse success(List<LogAnalysisResult> results) {
         return new BatchAnalysisResponse("success", LocalDateTime.now(), results.size(), results);
     }

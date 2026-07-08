@@ -31,10 +31,10 @@ public class PromptTemplateService {
     private void appendEntries(StringBuilder sb, List<LogEntry> logs) {
         int limit = Math.min(logs.size(), MAX_ENTRIES);
         for (int i = 0; i < limit; i++) {
-            sb.append(formatEntry(logs.get(i))).append("\n");
+            sb.append(formatEntry(logs.get(i))).append(System.lineSeparator());
         }
         if (logs.size() > MAX_ENTRIES) {
-            sb.append(String.format("\n[%d entries omitted — limit is %d]\n",
+            sb.append(String.format("%n[%d entries omitted — limit is %d]%n",
                 logs.size() - MAX_ENTRIES, MAX_ENTRIES));
         }
     }

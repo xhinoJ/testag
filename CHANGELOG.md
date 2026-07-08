@@ -33,7 +33,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Upgraded JaCoCo to 0.8.14 to support Java 26 bytecode (class file major version 70)
+- Resolved all 16 SpotBugs findings (`mvn spotbugs:check` now reports 0 bugs):
+  - `EI_EXPOSE_REP`/`EI_EXPOSE_REP2`: model records (`AnalysisOutput`, `LogAnalysisResult`, `BatchAnalysisRequest`, `BatchAnalysisResponse`) now store and return immutable defensive copies via `List.copyOf(...)`
+  - `EI_EXPOSE_REP2`: `LangChain4jGitHubModelsModel.objectMapper` and `LogAnalysisService.promptTemplateService` suppressed with `@SuppressFBWarnings` (thread-safe injected/shared collaborators, never mutated)
+  - `REC_CATCH_EXCEPTION`: narrowed broad `catch (Exception e)` in `LangChain4jGitHubModelsModel.parse(String)` to `JsonProcessingException`
+  - `VA_FORMAT_STRING_USES_NEWLINE`: `PromptTemplateService.appendEntries` now uses `System.lineSeparator()` / `%n` instead of literal `\n`
+- Added `com.github.spotbugs:spotbugs-annotations` (provided) dependency to enable `@SuppressFBWarnings`
 - Managed analysis ExecutorService as a Spring `Executor` bean (eliminates thread leak on context reload)
 - ChatClient bean injection (was bypassing configured bean)
 - analysisType parameter now passed through from controller to service

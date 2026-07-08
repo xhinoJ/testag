@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.List;
 
 @Service
@@ -21,6 +23,8 @@ public class LogAnalysisService {
     private final LogParserService logParserService;
     private final PromptTemplateService promptTemplateService;
 
+    @SuppressFBWarnings(value = "EI_EXPOSE_REP2",
+        justification = "Spring-injected collaborator, never mutated after construction")
     public LogAnalysisService(LogAnalysisModel logAnalysisModel,
                               LogParserService logParserService,
                               PromptTemplateService promptTemplateService) {
