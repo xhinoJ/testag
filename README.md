@@ -45,8 +45,8 @@ export GITHUB_TOKEN=ghp_xxx
 mvn spring-boot:run -Dspring-boot.run.arguments=--app.ai.provider=github-springai
 ```
 
-The GitHub Models endpoint is OpenAI-compatible; the `api-key` and `base-url` are configured
-under `spring.ai.openai` and consumed by the `GitHubModelsSpringAiModel` bean.
+The GitHub Models endpoint is OpenAI-compatible; the `api-key`, `base-url`, and `model` are configured
+under `app.ai.github-models` and consumed by the `GitHubModelsSpringAiModel` bean.
 
 ## API Endpoints
 
