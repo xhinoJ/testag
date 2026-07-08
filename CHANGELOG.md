@@ -35,6 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Made JaCoCo coverage and OWASP Dependency Check required (non-advisory) gates in `qa-after-merge.yml`
+- `ExecutorConfig` now sets `AwaitTerminationSeconds(30)` for graceful shutdown drain
+- Added `ExecutorConfigTest` asserting the analysis executor is a managed `ThreadPoolTaskExecutor`
 - Upgraded Java from 21 to 26
 - Upgraded exec-maven-plugin from 3.5.0 to 3.6.3
 - Upgraded Spring Boot from 3.5.3 to 4.1.0

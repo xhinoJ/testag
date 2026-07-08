@@ -18,6 +18,7 @@ public class ExecutorConfig {
         executor.setMaxPoolSize(MAX_POOL_SIZE);
         executor.setThreadNamePrefix("log-analysis-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
         executor.initialize();
         return executor;
     }

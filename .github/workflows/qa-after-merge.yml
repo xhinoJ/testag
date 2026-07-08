@@ -39,15 +39,13 @@ jobs:
 
       - name: OWASP Dependency Check (CVE scan)
         run: mvn org.owasp:dependency-check-maven:check -q
-        continue-on-error: true
 
       - name: SpotBugs / Static Analysis
         run: mvn spotbugs:check -q
         continue-on-error: true
 
-      - name: JaCoCo Coverage
+      - name: JaCoCo Coverage (required)
         run: mvn jacoco:check -q
-        continue-on-error: true
 
       - name: Checkstyle
         run: mvn checkstyle:check -q
