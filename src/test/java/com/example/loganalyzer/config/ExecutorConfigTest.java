@@ -45,8 +45,8 @@ class ExecutorConfigTest {
         Object controllerExecutor = field.get(controller);
 
         Executor managedExecutor = context.getBean("analysisExecutor", Executor.class);
-        assertFalse(controllerExecutor.getClass().getSimpleName().contains("DelegatedExecutorService"),
-            "controller must not hold a raw Executors-wrapped pool");
+        assertInstanceOf(ThreadPoolTaskExecutor.class, controllerExecutor,
+            "controller must hold the managed ThreadPoolTaskExecutor, not a raw Executors-wrapped pool");
         assertEquals(managedExecutor, controllerExecutor,
             "controller must be injected with the container-managed analysisExecutor bean");
     }

@@ -18,6 +18,7 @@ public class ExecutorConfig {
         executor.setMaxPoolSize(MAX_POOL_SIZE);
         executor.setThreadNamePrefix("log-analysis-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
+        // Give in-flight batch analyses up to 30s to finish on context shutdown before forcing termination.
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
         return executor;
