@@ -28,6 +28,26 @@ cd springailogs
 mvn spring-boot:run
 ```
 
+## LLM Provider Configuration
+
+The LLM layer is framework-agnostic behind the `LogAnalysisModel` interface. The active
+implementation is selected via `app.ai.provider` (see `src/main/resources/application.yml`).
+
+| `app.ai.provider` | Implementation | Backend |
+|-------------------|---------------|---------|
+| `ollama` (default) | `OllamaSpringAiModel` | Ollama (`http://localhost:11434`, model `llama3.1`) |
+| `github-springai` | `GitHubModelsSpringAiModel` | GitHub Models (`https://models.inference.ai.azure.com`) |
+
+Example — switch to GitHub Models (requires a `GITHUB_TOKEN` with `models:read`):
+
+```bash
+export GITHUB_TOKEN=ghp_xxx
+mvn spring-boot:run -Dspring-boot.run.arguments=--app.ai.provider=github-springai
+```
+
+The GitHub Models endpoint is OpenAI-compatible; the `api-key`, `base-url`, and `model` are configured
+under `app.ai.github-models` and consumed by the `GitHubModelsSpringAiModel` bean.
+
 ## API Endpoints
 
 | Method | Endpoint | Description |
@@ -99,14 +119,29 @@ spring:
         temperature: 0.3
         num-threads: 4
 
+app:
+  ai:
+    provider: ollama                # ollama (default) or github-springai
+    github-models:                  # used only when provider=github-springai
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      model: openai/gpt-4o-mini
+
 server:
   port: 8080
 
 logging:
   level:
     com.example.loganalyzer: DEBUG
-    org.springframework.ai: DEBUG
+    org.springframework.ai: INFO
 ```
+
+### Switching LLM providers
+
+The LLM layer is framework-agnostic via `LogAnalysisModel`. Select the backend with `app.ai.provider`:
+
+- `ollama` (default) — local Ollama, no external credentials.
+- `github-springai` — GitHub Models inference API (OpenAI-compatible). Requires a `GITHUB_TOKEN` with the `models:read` scope exported in the environment.
 
 ## Features
 
@@ -166,6 +201,10 @@ src/main/java/com/example/loganalyzer/
     ├── LogAnalysisService.java
     ├── LogParserService.java
     └── PromptTemplateService.java
+└── llm/
+    ├── LogAnalysisModel.java
+    ├── OllamaSpringAiModel.java
+    └── GitHubModelsSpringAiModel.java
 ```
 
 ```
@@ -178,6 +217,9 @@ src/test/java/com/example/loganalyzer/
     ├── LogGenerator.java
     ├── LogGeneratorTest.java
     └── LogParserServiceTest.java
+└── llm/
+    ├── OllamaSpringAiModelTest.java
+    └── GitHubModelsSpringAiModelTest.java
 ```
 
 ## Development Workflow

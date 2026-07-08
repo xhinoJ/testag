@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Framework-agnostic `LogAnalysisModel` abstraction (`src/main/java/com/example/loganalyzer/llm/`)
+- `OllamaSpringAiModel` implementation (default, wraps Ollama `ChatClient`)
+- `GitHubModelsSpringAiModel` implementation (GitHub Models via `spring-ai-starter-model-openai`)
+- `AppAiProperties` `@ConfigurationProperties` enum for validated `app.ai.provider` binding
+- Provider selection via `app.ai.provider` (`ollama` default, `github-springai`) using `@ConditionalOnProperty`
+- `OllamaSpringAiModelTest`, `GitHubModelsSpringAiModelTest`, `LogAnalysisServiceModelTest`
 - GlobalExceptionHandler for structured error responses
 - RequestLoggingInterceptor for HTTP request/response logging
 - Input truncation in PromptTemplateService (MAX_ENTRIES=200, MAX_ENTRY_CHARS=2000)
@@ -35,6 +41,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `LogAnalysisService` now depends on `LogAnalysisModel` instead of `ChatClient` directly (no framework coupling)
+- `AiConfig` builds the Ollama `ChatClient` only when the Ollama provider is active and adds a conditional GitHub Models `ChatClient` bean
+- Added `spring-ai-starter-model-openai` dependency; all OpenAI autoconfigurations excluded (model built conditionally/manually) so the Ollama default context starts without OpenAI credentials
+- GitHub Models credentials sourced via `app.ai.github-models.api-key` (`${GITHUB_TOKEN}`) through Spring property resolution, not `System.getenv`
+- `LogAnalysisService` no longer double-wraps `LogAnalysisException` from model implementations
+- `org.springframework.ai` logging default lowered from `DEBUG` to `INFO`
+- `app.ai.provider=ollama` documented in `application.yml` as the working default
 - Made JaCoCo coverage a required (non-advisory) gate; OWASP Dependency Check kept advisory in `qa-after-merge.yml`
 - `ExecutorConfig` now sets `AwaitTerminationSeconds(30)` for graceful shutdown drain
 - Added `ExecutorConfigTest` asserting the analysis executor is a managed `ThreadPoolTaskExecutor`

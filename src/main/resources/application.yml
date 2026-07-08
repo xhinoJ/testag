@@ -9,6 +9,25 @@ spring:
         model: llama3.1
         temperature: 0.3
         num-threads: 4
+    openai:
+      enabled: false
+
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration
+
+app:
+  ai:
+    provider: ollama
+    github-models:
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      model: openai/gpt-4o-mini
 
 server:
   port: 8080
@@ -16,4 +35,4 @@ server:
 logging:
   level:
     com.example.loganalyzer: DEBUG
-    org.springframework.ai: DEBUG
+    org.springframework.ai: INFO
