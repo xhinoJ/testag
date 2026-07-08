@@ -28,6 +28,10 @@ app:
       base-url: https://models.inference.ai.azure.com
       api-key: ${GITHUB_TOKEN}
       model: openai/gpt-4o-mini
+    github-langchain4j:
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      model: openai/gpt-4o-mini
 
 server:
   port: 8080
