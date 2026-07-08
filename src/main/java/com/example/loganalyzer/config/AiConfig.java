@@ -1,8 +1,11 @@
 package com.example.loganalyzer.config;
 
 import com.example.loganalyzer.llm.GitHubModelsSpringAiModel;
+import com.example.loganalyzer.llm.LangChain4jGitHubModelsModel;
 import com.example.loganalyzer.llm.LogAnalysisModel;
 import com.example.loganalyzer.llm.OllamaSpringAiModel;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.langchain4j.model.openaiofficial.OpenAiOfficialChatModel;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
@@ -32,6 +35,7 @@ public class AiConfig {
     @Bean
     @ConditionalOnProperty(name = "app.ai.provider", havingValue = "github-springai")
     public OpenAiChatModel githubModelsChatModel(AppAiProperties properties) {
+        requireGitHubToken(properties.getGitHubModels().getApiKey());
         OpenAiChatOptions options = OpenAiChatOptions.builder()
             .baseUrl(properties.getGitHubModels().getBaseUrl())
             .apiKey(properties.getGitHubModels().getApiKey())
@@ -52,6 +56,19 @@ public class AiConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "app.ai.provider", havingValue = "github-langchain4j")
+    public OpenAiOfficialChatModel langChain4jGitHubModelsChatModel(AppAiProperties properties) {
+        AppAiProperties.GitHubLangChain4j cfg = properties.getGitHubLangChain4j();
+        requireGitHubToken(cfg.getApiKey());
+        return OpenAiOfficialChatModel.builder()
+            .baseUrl(cfg.getBaseUrl())
+            .apiKey(cfg.getApiKey())
+            .isGitHubModels(true)
+            .modelName(cfg.getModel())
+            .build();
+    }
+
+    @Bean
     @ConditionalOnProperty(name = "app.ai.provider", havingValue = "ollama", matchIfMissing = true)
     public LogAnalysisModel ollamaLogAnalysisModel(ChatClient ollamaChatClient) {
         return new OllamaSpringAiModel(ollamaChatClient);
@@ -61,5 +78,18 @@ public class AiConfig {
     @ConditionalOnProperty(name = "app.ai.provider", havingValue = "github-springai")
     public LogAnalysisModel githubModelsLogAnalysisModel(ChatClient githubModelsChatClient) {
         return new GitHubModelsSpringAiModel(githubModelsChatClient);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "app.ai.provider", havingValue = "github-langchain4j")
+    public LogAnalysisModel langChain4jGitHubModelsLogAnalysisModel(OpenAiOfficialChatModel chatModel,
+                                                                     ObjectMapper objectMapper) {
+        return new LangChain4jGitHubModelsModel(chatModel, objectMapper);
+    }
+
+    private void requireGitHubToken(String apiKey) {
+        if (apiKey == null || apiKey.isBlank() || "${GITHUB_TOKEN}".equals(apiKey.trim())) {
+            throw new IllegalStateException("GITHUB_TOKEN is required for the github models provider");
+        }
     }
 }

@@ -13,8 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `OllamaSpringAiModel` implementation (default, wraps Ollama `ChatClient`)
 - `GitHubModelsSpringAiModel` implementation (GitHub Models via `spring-ai-starter-model-openai`)
 - `AppAiProperties` `@ConfigurationProperties` enum for validated `app.ai.provider` binding
-- Provider selection via `app.ai.provider` (`ollama` default, `github-springai`) using `@ConditionalOnProperty`
-- `OllamaSpringAiModelTest`, `GitHubModelsSpringAiModelTest`, `LogAnalysisServiceModelTest`
+- Provider selection via `app.ai.provider` (`ollama` default, `github-springai`, `github-langchain4j`) using `@ConditionalOnProperty`
+- `LangChain4jGitHubModelsModel` implementation (GitHub Models via LangChain4j `OpenAiOfficialChatModel`, `isGitHubModels(true)`, model `openai/gpt-4o-mini`); parses JSON model output into `AnalysisOutput` with Jackson
+- `langchain4j-open-ai-official` dependency (`langchain4j.version=1.13.1-beta23`); deprecated `langchain4j-github-models` intentionally not used
+- Fail-fast startup when `github-springai`/`github-langchain4j` selected but `apiKey` is blank or the unresolved `${GITHUB_TOKEN}` placeholder (message: `GITHUB_TOKEN is required for the github models provider`)
+- `OllamaSpringAiModelTest`, `GitHubModelsSpringAiModelTest`, `LangChain4jGitHubModelsModelTest`, `ProviderWiringIntegrationTest`, `LogAnalysisServiceModelTest`
 - GlobalExceptionHandler for structured error responses
 - RequestLoggingInterceptor for HTTP request/response logging
 - Input truncation in PromptTemplateService (MAX_ENTRIES=200, MAX_ENTRY_CHARS=2000)
@@ -42,8 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `LogAnalysisService` now depends on `LogAnalysisModel` instead of `ChatClient` directly (no framework coupling)
-- `AiConfig` builds the Ollama `ChatClient` only when the Ollama provider is active and adds a conditional GitHub Models `ChatClient` bean
-- Added `spring-ai-starter-model-openai` dependency; all OpenAI autoconfigurations excluded (model built conditionally/manually) so the Ollama default context starts without OpenAI credentials
+- `AiConfig` builds the Ollama `ChatClient` only when the Ollama provider is active and adds conditional GitHub Models beans for both `github-springai` and `github-langchain4j`
+- Added `spring-ai-starter-model-openai` and `langchain4j-open-ai-official` dependencies; all OpenAI autoconfigurations excluded (models built conditionally/manually) so the Ollama default context starts without OpenAI/LangChain4j credentials
 - GitHub Models credentials sourced via `app.ai.github-models.api-key` (`${GITHUB_TOKEN}`) through Spring property resolution, not `System.getenv`
 - `LogAnalysisService` no longer double-wraps `LogAnalysisException` from model implementations
 - `org.springframework.ai` logging default lowered from `DEBUG` to `INFO`

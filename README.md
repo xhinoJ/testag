@@ -36,7 +36,8 @@ implementation is selected via `app.ai.provider` (see `src/main/resources/applic
 | `app.ai.provider` | Implementation | Backend |
 |-------------------|---------------|---------|
 | `ollama` (default) | `OllamaSpringAiModel` | Ollama (`http://localhost:11434`, model `llama3.1`) |
-| `github-springai` | `GitHubModelsSpringAiModel` | GitHub Models (`https://models.inference.ai.azure.com`) |
+| `github-springai` | `GitHubModelsSpringAiModel` | GitHub Models (`https://models.inference.ai.azure.com`) via Spring AI OpenAI starter |
+| `github-langchain4j` | `LangChain4jGitHubModelsModel` | GitHub Models (`https://models.inference.ai.azure.com`) via LangChain4j `OpenAiOfficialChatModel` |
 
 Example — switch to GitHub Models (requires a `GITHUB_TOKEN` with `models:read`):
 
@@ -46,7 +47,8 @@ mvn spring-boot:run -Dspring-boot.run.arguments=--app.ai.provider=github-springa
 ```
 
 The GitHub Models endpoint is OpenAI-compatible; the `api-key`, `base-url`, and `model` are configured
-under `app.ai.github-models` and consumed by the `GitHubModelsSpringAiModel` bean.
+under `app.ai.github-models` (Spring AI) or `app.ai.github-langchain4j` (LangChain4j) and consumed by the
+respective model bean.
 
 ## API Endpoints
 
@@ -121,8 +123,12 @@ spring:
 
 app:
   ai:
-    provider: ollama                # ollama (default) or github-springai
+    provider: ollama                # ollama (default), github-springai, or github-langchain4j
     github-models:                  # used only when provider=github-springai
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      model: openai/gpt-4o-mini
+    github-langchain4j:             # used only when provider=github-langchain4j
       base-url: https://models.inference.ai.azure.com
       api-key: ${GITHUB_TOKEN}
       model: openai/gpt-4o-mini
@@ -141,7 +147,12 @@ logging:
 The LLM layer is framework-agnostic via `LogAnalysisModel`. Select the backend with `app.ai.provider`:
 
 - `ollama` (default) — local Ollama, no external credentials.
-- `github-springai` — GitHub Models inference API (OpenAI-compatible). Requires a `GITHUB_TOKEN` with the `models:read` scope exported in the environment.
+- `github-springai` — GitHub Models inference API (OpenAI-compatible) via Spring AI. Requires a `GITHUB_TOKEN` with the `models:read` scope exported in the environment.
+- `github-langchain4j` — GitHub Models inference API via LangChain4j `OpenAiOfficialChatModel` (`isGitHubModels(true)`, model `openai/gpt-4o-mini`). Requires a `GITHUB_TOKEN` with the `models:read` scope.
+
+When `provider` is `github-springai` or `github-langchain4j`, the application fails fast at startup with
+`GITHUB_TOKEN is required for the github models provider` if the resolved `apiKey` is blank or still the
+unresolved `${GITHUB_TOKEN}` placeholder. The `ollama` default needs no token.
 
 ## Features
 
@@ -204,7 +215,8 @@ src/main/java/com/example/loganalyzer/
 └── llm/
     ├── LogAnalysisModel.java
     ├── OllamaSpringAiModel.java
-    └── GitHubModelsSpringAiModel.java
+    ├── GitHubModelsSpringAiModel.java
+    └── LangChain4jGitHubModelsModel.java
 ```
 
 ```
@@ -219,7 +231,10 @@ src/test/java/com/example/loganalyzer/
     └── LogParserServiceTest.java
 └── llm/
     ├── OllamaSpringAiModelTest.java
-    └── GitHubModelsSpringAiModelTest.java
+    ├── GitHubModelsSpringAiModelTest.java
+    └── LangChain4jGitHubModelsModelTest.java
+└── config/
+    └── ProviderWiringIntegrationTest.java
 ```
 
 ## Development Workflow
