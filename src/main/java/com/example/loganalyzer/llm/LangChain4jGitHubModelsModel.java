@@ -57,7 +57,7 @@ public class LangChain4jGitHubModelsModel implements LogAnalysisModel {
                 defaultList(dto.suggestions()),
                 defaultList(dto.patterns()));
         } catch (Exception e) {
-            log.error("Failed to parse LLM response into AnalysisOutput: {}", text, e);
+            log.error("Failed to parse LLM response into AnalysisOutput: {}", truncate(text), e);
             throw new LogAnalysisException("Unable to parse model response: " + e.getMessage(), e);
         }
     }
@@ -67,12 +67,30 @@ public class LangChain4jGitHubModelsModel implements LogAnalysisModel {
             throw new LogAnalysisException("Empty model response", null);
         }
         String trimmed = text.trim();
-        int start = trimmed.indexOf('{');
-        int end = trimmed.lastIndexOf('}');
+        String fenceStripped = stripMarkdownFences(trimmed);
+        int start = fenceStripped.indexOf('{');
+        int end = fenceStripped.lastIndexOf('}');
         if (start < 0 || end <= start) {
             throw new LogAnalysisException("No JSON object found in model response", null);
         }
-        return trimmed.substring(start, end + 1);
+        return fenceStripped.substring(start, end + 1);
+    }
+
+    private static String stripMarkdownFences(String text) {
+        String marker = "```";
+        int firstFence = text.indexOf(marker);
+        if (firstFence < 0) {
+            return text;
+        }
+        String afterOpening = text.substring(firstFence + marker.length());
+        int langEnd = afterOpening.indexOf('\n');
+        String body = langEnd >= 0 ? afterOpening.substring(langEnd + 1) : afterOpening;
+        int closing = body.indexOf(marker);
+        return closing >= 0 ? body.substring(0, closing).trim() : body.trim();
+    }
+
+    private static String truncate(String value) {
+        return value == null ? null : (value.length() <= 500 ? value : value.substring(0, 500) + "...");
     }
 
     private static String blankToNull(String value) {

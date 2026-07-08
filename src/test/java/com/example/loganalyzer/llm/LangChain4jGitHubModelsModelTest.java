@@ -53,6 +53,16 @@ class LangChain4jGitHubModelsModelTest {
     }
 
     @Test
+    void shouldExtractJsonIgnoringSurroundingText() {
+        ChatModel chatModel = chatModelReturning("Here is the analysis:\n{\"summary\":\"x\",\"rootCause\":\"y\"}");
+
+        AnalysisOutput output = new LangChain4jGitHubModelsModel(chatModel, objectMapper).analyze("logs");
+
+        assertThat(output.summary()).isEqualTo("x");
+        assertThat(output.rootCause()).isEqualTo("y");
+    }
+
+    @Test
     void shouldThrowWhenResponseIsNotJson() {
         ChatModel chatModel = chatModelReturning("not json at all");
 
