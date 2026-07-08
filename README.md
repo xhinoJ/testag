@@ -143,6 +143,7 @@ src/main/java/com/example/loganalyzer/
 ├── LoganalyzerApplication.java
 ├── config/
 │   ├── AiConfig.java
+│   ├── ExecutorConfig.java
 │   ├── OpenApiConfig.java
 │   ├── RequestLoggingInterceptor.java
 │   └── WebConfig.java
@@ -170,6 +171,7 @@ src/main/java/com/example/loganalyzer/
 ```
 src/test/java/com/example/loganalyzer/
 ├── config/
+│   ├── ExecutorConfigTest.java
 │   ├── RequestLoggingInterceptorTest.java
 │   └── WebConfigIntegrationTest.java
 └── service/
@@ -180,10 +182,11 @@ src/test/java/com/example/loganalyzer/
 
 ## Development Workflow
 
-This project uses a two-agent development workflow:
+This project uses a multi-agent development workflow:
 
-- **@legendary-backend-engineer** - Implements features, creates PRs
+- **@legendary-backend-engineer** - Implements features/fixes on a feature branch, creates PRs
 - **@legendary-reviewer** - Reviews code, approves or requests changes
+- **@legendary-tester** - Auto-triggered after merge to `main` for comprehensive QA
 
 See [AGENTS.md](AGENTS.md) for details.
 
