@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Upgraded JaCoCo to 0.8.14 to support Java 26 bytecode (class file major version 70)
+- Managed analysis ExecutorService as a Spring `Executor` bean (eliminates thread leak on context reload)
 - ChatClient bean injection (was bypassing configured bean)
 - analysisType parameter now passed through from controller to service
 - Division by zero in determineSeverity
