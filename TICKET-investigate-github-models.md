@@ -29,9 +29,11 @@ The goal of this ticket is to answer whether we can:
 
 ```java
 public interface LogAnalysisModel {
-    String analyze(String prompt);
+    AnalysisOutput analyze(String prompt);
 }
 ```
+
+> **Contract note (important):** Structured-output mapping (e.g. `chatClient.prompt().user(p).call().entity(AnalysisOutput.class)`) must be **encapsulated inside each implementation**, never in `LogAnalysisService`. Returning a raw `String` and re-parsing inside a framework-specific path would reintroduce coupling. Each implementation owns its own prompt construction and POJO binding; the service depends only on the `LogAnalysisModel` abstraction.
 
 Implementations:
 
@@ -43,6 +45,7 @@ Wiring:
 
 - Select via a property, e.g. `app.ai.provider=ollama|github-springai|github-langchain4j`.
 - Use Spring `@ConditionalOnProperty` (or profiles) so only the active implementation bean is created.
+- **Default/failsafe:** mark the `ollama` implementation `@ConditionalOnProperty(havingValue="ollama", matchIfMissing=true)` so a missing/typo'd value still yields a working bean; otherwise no `LogAnalysisModel` bean is created and the context fails at startup with `NoSuchBeanDefinitionException`. Prefer a `@ConfigurationProperties` enum for `app.ai.provider` to validate values at bind time.
 - `LogAnalysisService` depends solely on `LogAnalysisModel` — it never references `ChatClient` or `ChatLanguageModel` directly.
 
 This keeps `LogAnalysisService` unchanged across provider/framework swaps.
@@ -52,7 +55,7 @@ This keeps `LogAnalysisService` unchanged across provider/framework swaps.
 **Yes, indirectly (no native "Copilot" provider exists).**
 
 - Spring AI has no dedicated "GitHub Models" or "Copilot" starter. Its provider matrix includes OpenAI, Azure OpenAI, Anthropic, Ollama, Vertex AI, Bedrock, DeepSeek, etc.
-- GitHub Models is an **OpenAI-compatible** endpoint: `https://models.inference.ai.azure.com`, authenticated with a `GITHUB_TOKEN`.
+- GitHub Models is an **OpenAI-compatible** endpoint: `https://models.inference.ai.azure.com`, authenticated with a `GITHUB_TOKEN`. (GitHub also exposes a native REST endpoint `https://models.github.ai/inference/chat/completions`, but the OpenAI-compatible Azure endpoint above is what Spring AI's OpenAI starter requires.)
 - Therefore the existing `spring-ai-starter-model-openai` works by overriding `base-url` + `api-key`:
 
 ```yaml
@@ -83,7 +86,7 @@ ChatModel model = OpenAiOfficialChatModel.builder()
         .build();
 ```
 
-`GITHUB_TOKEN` is auto-detected from the environment in GitHub Actions / Codespaces.
+`GITHUB_TOKEN` is injected in GitHub Actions / Codespaces but must be provisioned with the `models:read` scope (the default Actions `GITHUB_TOKEN` does not grant GitHub Models inference by default); export it explicitly (or pass `apiKey(System.getenv("GITHUB_TOKEN"))`). A fine-grained PAT or GitHub App token with `models:read` is typically required.
 
 ## 5. Q3 — Migration to LangChain4j: pros & cons
 
