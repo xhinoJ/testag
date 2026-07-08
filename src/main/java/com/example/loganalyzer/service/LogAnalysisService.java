@@ -1,13 +1,13 @@
 package com.example.loganalyzer.service;
 
 import com.example.loganalyzer.exception.LogAnalysisException;
+import com.example.loganalyzer.llm.LogAnalysisModel;
 import com.example.loganalyzer.model.AnalysisOutput;
 import com.example.loganalyzer.model.AnalysisType;
 import com.example.loganalyzer.model.LogAnalysisResult;
 import com.example.loganalyzer.model.LogEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,14 +17,14 @@ public class LogAnalysisService {
 
     private static final Logger log = LoggerFactory.getLogger(LogAnalysisService.class);
 
-    private final ChatClient chatClient;
+    private final LogAnalysisModel logAnalysisModel;
     private final LogParserService logParserService;
     private final PromptTemplateService promptTemplateService;
 
-    public LogAnalysisService(ChatClient chatClient,
+    public LogAnalysisService(LogAnalysisModel logAnalysisModel,
                               LogParserService logParserService,
                               PromptTemplateService promptTemplateService) {
-        this.chatClient = chatClient;
+        this.logAnalysisModel = logAnalysisModel;
         this.logParserService = logParserService;
         this.promptTemplateService = promptTemplateService;
     }
@@ -53,10 +53,7 @@ public class LogAnalysisService {
 
         AnalysisOutput output;
         try {
-            output = chatClient.prompt()
-                .user(prompt)
-                .call()
-                .entity(AnalysisOutput.class);
+            output = logAnalysisModel.analyze(prompt);
         } catch (Exception e) {
             log.error("AI analysis failed for type {}", type, e);
             throw new LogAnalysisException("AI service unavailable: " + e.getMessage(), e);

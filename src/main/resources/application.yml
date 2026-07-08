@@ -9,6 +9,20 @@ spring:
         model: llama3.1
         temperature: 0.3
         num-threads: 4
+    openai:
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      chat:
+        options:
+          model: openai/gpt-4o-mini
+
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+
+app:
+  ai:
+    provider: ollama
 
 server:
   port: 8080
