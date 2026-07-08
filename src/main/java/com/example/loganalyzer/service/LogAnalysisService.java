@@ -54,6 +54,8 @@ public class LogAnalysisService {
         AnalysisOutput output;
         try {
             output = logAnalysisModel.analyze(prompt);
+        } catch (LogAnalysisException e) {
+            throw e;
         } catch (Exception e) {
             log.error("AI analysis failed for type {}", type, e);
             throw new LogAnalysisException("AI service unavailable: " + e.getMessage(), e);

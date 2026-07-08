@@ -119,14 +119,29 @@ spring:
         temperature: 0.3
         num-threads: 4
 
+app:
+  ai:
+    provider: ollama                # ollama (default) or github-springai
+    github-models:                  # used only when provider=github-springai
+      base-url: https://models.inference.ai.azure.com
+      api-key: ${GITHUB_TOKEN}
+      model: openai/gpt-4o-mini
+
 server:
   port: 8080
 
 logging:
   level:
     com.example.loganalyzer: DEBUG
-    org.springframework.ai: DEBUG
+    org.springframework.ai: INFO
 ```
+
+### Switching LLM providers
+
+The LLM layer is framework-agnostic via `LogAnalysisModel`. Select the backend with `app.ai.provider`:
+
+- `ollama` (default) — local Ollama, no external credentials.
+- `github-springai` — GitHub Models inference API (OpenAI-compatible). Requires a `GITHUB_TOKEN` with the `models:read` scope exported in the environment.
 
 ## Features
 

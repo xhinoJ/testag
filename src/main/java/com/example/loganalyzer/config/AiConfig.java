@@ -33,10 +33,10 @@ public class AiConfig {
     @ConditionalOnProperty(name = "app.ai.provider", havingValue = "github-springai")
     public OpenAiChatModel githubModelsChatModel(AppAiProperties properties) {
         OpenAiChatOptions options = OpenAiChatOptions.builder()
-            .baseUrl("https://models.inference.ai.azure.com")
-            .apiKey(System.getenv("GITHUB_TOKEN"))
+            .baseUrl(properties.getGitHubModels().getBaseUrl())
+            .apiKey(properties.getGitHubModels().getApiKey())
             .gitHubModels(true)
-            .model("openai/gpt-4o-mini")
+            .model(properties.getGitHubModels().getModel())
             .build();
         return OpenAiChatModel.builder()
             .options(options)
