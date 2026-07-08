@@ -37,9 +37,8 @@ jobs:
         run: mvn dependency:analyze -q
         continue-on-error: true
 
-      - name: SpotBugs / Static Analysis
+      - name: SpotBugs / Static Analysis (required)
         run: mvn spotbugs:check -q
-        continue-on-error: true
 
       - name: JaCoCo Coverage (required)
         run: mvn jacoco:check -q
@@ -55,5 +54,6 @@ jobs:
           echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
           echo "|---|---|" >> $GITHUB_STEP_SUMMARY
           echo "| Compile | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit & Integration Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+           echo "| Unit & Integration Tests | ✅ |" >> $GITHUB_STEP_SUMMARY
+           echo "| SpotBugs (required) | ✅ |" >> $GITHUB_STEP_SUMMARY
+           echo "" >> $GITHUB_STEP_SUMMARY

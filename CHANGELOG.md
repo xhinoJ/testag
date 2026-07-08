@@ -39,7 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `REC_CATCH_EXCEPTION`: narrowed broad `catch (Exception e)` in `LangChain4jGitHubModelsModel.parse(String)` to `JsonProcessingException`
   - `VA_FORMAT_STRING_USES_NEWLINE`: `PromptTemplateService.appendEntries` now uses `System.lineSeparator()` / `%n` instead of literal `\n`
 - Added `com.github.spotbugs:spotbugs-annotations` (provided) dependency to enable `@SuppressFBWarnings`
-- Managed analysis ExecutorService as a Spring `Executor` bean (eliminates thread leak on context reload)
+- Made SpotBugs a required CI gate: `spotbugs-maven-plugin` `failOnError` set to `true` and the `SpotBugs / Static Analysis` step in `qa-after-merge.yml` is now required (no longer `continue-on-error`)
 - ChatClient bean injection (was bypassing configured bean)
 - analysisType parameter now passed through from controller to service
 - Division by zero in determineSeverity
